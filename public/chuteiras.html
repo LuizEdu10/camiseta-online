@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja de Vendas - Chuteiras</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Chuteiras</h1>
+            <nav>
+                <ul>
+                    <li><a href="LOJA.html">Home</a></li>
+                    <li><a href="loja.html">Produtos</a></li>
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" id="categoriesDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Categorias</a>
+                        <div class="dropdown-menu" aria-labelledby="categoriesDropdown">
+                            <a class="dropdown-item" href="camisetas.html">Camisetas</a>
+                            <a class="dropdown-item" href="tenis.html">Tênis</a>
+                            <a class="dropdown-item" href="chuteiras.html">Chuteiras</a>
+                            <!-- Adicione mais categorias conforme necessário -->
+                        </div>
+                    </li>
+                    <li><a href="contato.html" target="_blank">Contato</a></li>
+                </ul>
+            </nav>
+            <button id="cartButton" class="btn btn-primary" data-toggle="modal" data-target="#cartModal">Carrinho (<span id="cartCount">0</span>)</button>
+        </div>
+    </header>
+
+    <section class="banner">
+        <div class="banner-content">
+            <h2>Ofertas Imperdíveis em Chuteiras!</h2>
+            <p>Aproveite os melhores preços em chuteiras de alta qualidade.</p>
+        </div>
+    </section>
+
+    <section id="products">
+        <div class="container">
+            <h2>Chuteiras</h2>
+            <div id="productGrid" class="product-grid">
+                <!-- Produtos serão carregados aqui via JavaScript -->
+            </div>
+            <div class="pagination">
+                <button id="prevPage" class="btn btn-primary">Anterior</button>
+                <span id="pageInfo"></span>
+                <button id="nextPage" class="btn btn-primary">Próxima</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal do Carrinho -->
+    <div class="modal fade" id="cartModal" tabindex="-1" role="dialog" aria-labelledby="cartModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cartModalLabel">Carrinho de Compras</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul id="cartItems"></ul>
+                    <p>Total: R$ <span id="cartTotal">0.00</span></p>
+                    <form id="checkoutForm">
+                        <div class="form-group">
+                            <label for="name">Nome:</label>
+                            <input type="text" class="form-control" id="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">Endereço:</label>
+                            <input type="text" class="form-control" id="address" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">Telefone:</label>
+                            <input type="text" class="form-control" id="phone" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Finalizar Pedido</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Loja de Vendas. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        let cart = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const addToCartButtons = document.querySelectorAll('.add-to-cart');
+            const cartCount = document.getElementById('cartCount');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            const checkoutForm = document.getElementById('checkoutForm');
+            const productGrid = document.getElementById('productGrid');
+            const prevPageButton = document.getElementById('prevPage');
+            const nextPageButton = document.getElementById('nextPage');
+            const pageInfo = document.getElementById('pageInfo');
+            const productsPerPage = 15;
+            let currentPage = 1;
+
+            // Produtos de exemplo
+            const products = [
+                { name: 'Chuteira 1', price: 120, image: 'images/chuteira1.jpg' },
+                { name: 'Chuteira 2', price: 130, image: 'images/chuteira2.jpg' },
+                { name: 'Chuteira 3', price: 140, image: 'images/chuteira3.jpg' },
+                { name: 'Chuteira 4', price: 150, image: 'images/chuteira4.jpg' },
+                { name: 'Chuteira 5', price: 160, image: 'images/chuteira5.jpg' },
+                { name: 'Chuteira 6', price: 170, image: 'images/chuteira6.jpg' },
+                { name: 'Chuteira 7', price: 180, image: 'images/chuteira7.jpg' },
+                { name: 'Chuteira 8', price: 190, image: 'images/chuteira8.jpg' },
+                { name: 'Chuteira 9', price: 200, image: 'images/chuteira9.jpg' },
+                { name: 'Chuteira 10', price: 210, image: 'images/chuteira10.jpg' },
+                { name: 'Chuteira 11', price: 220, image: 'images/chuteira11.jpg' },
+                { name: 'Chuteira 12', price: 230, image: 'images/chuteira12.jpg' },
+                { name: 'Chuteira 13', price: 240, image: 'images/chuteira13.jpg' },
+                { name: 'Chuteira 14', price: 250, image: 'images/chuteira14.jpg' },
+                { name: 'Chuteira 15', price: 260, image: 'images/chuteira15.jpg' },
+                { name: 'Chuteira 16', price: 270, image: 'images/chuteira16.jpg' },
+                { name: 'Chuteira 17', price: 280, image: 'images/chuteira17.jpg' },
+                { name: 'Chuteira 18', price: 290, image: 'images/chuteira18.jpg' },
+                { name: 'Chuteira 19', price: 300, image: 'images/chuteira19.jpg' },
+                { name: 'Chuteira 20', price: 310, image: 'images/chuteira20.jpg' },
+                { name: 'Chuteira 21', price: 320, image: 'images/chuteira21.jpg' },
+                { name: 'Chuteira 22', price: 330, image: 'images/chuteira22.jpg' },
+                { name: 'Chuteira 23', price: 340, image: 'images/chuteira23.jpg' },
+                { name: 'Chuteira 24', price: 350, image: 'images/chuteira24.jpg' },
+                { name: 'Chuteira 25', price: 360, image: 'images/chuteira25.jpg' },
+            ];
+
+            // Adiciona produtos ao carrinho
+            function addToCart(name, price) {
+                const item = { name, price };
+                cart.push(item);
+                localStorage.setItem('cart', JSON.stringify(cart)); // Salva no localStorage
+                updateCartUI();
+            }
+
+            // Remove produtos do carrinho
+            function removeFromCart(index) {
+                cart.splice(index, 1);
+                localStorage.setItem('cart', JSON.stringify(cart)); // Atualiza no localStorage
+                updateCartUI();
+            }
+
+            // Atualiza a UI do carrinho
+            function updateCartUI() {
+                cart = JSON.parse(localStorage.getItem('cart')) || []; // Carrega do localStorage
+                cartItems.innerHTML = '';
+                let total = 0;
+
+                cart.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = `${item.name} - R$ ${item.price.toFixed(2)}`;
+                    const removeButton = document.createElement('button');
+                    removeButton.textContent = 'Remover';
+                    removeButton.addEventListener('click', () => removeFromCart(index));
+                    li.appendChild(removeButton);
+                    cartItems.appendChild(li);
+                    total += item.price;
+                });
+
+                cartCount.textContent = cart.length;
+                cartTotal.textContent = total.toFixed(2);
+            }
+
+            // Finaliza o pedido e envia pelo WhatsApp
+            function checkout(event) {
+                event.preventDefault();
+                const name = document.getElementById('name').value;
+                const address = document.getElementById('address').value;
+                const phone = document.getElementById('phone').value;
+
+                const orderDetails = cart.map(item => `${item.name} - R$ ${item.price.toFixed(2)}`).join('\n');
+                const total = cart.reduce((sum, item) => sum + item.price, 0).toFixed(2);
+
+                const message = `Olá, gostaria de fazer um pedido:\n\n${orderDetails}\n\nTotal: R$ ${total}\n\nNome: ${name}\nEndereço: ${address}\nTelefone: ${phone}`;
+
+                const whatsappUrl = `https://wa.me/554999?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            }
+
+            // Função para exibir produtos na página
+            function displayProducts(page) {
+                productGrid.innerHTML = '';
+                const start = (page - 1) * productsPerPage;
+                const end = page * productsPerPage;
+                const pageProducts = products.slice(start, end);
+
+                pageProducts.forEach(product => {
+                    const productElement = document.createElement('div');
+                    productElement.classList.add('product');
+                    productElement.innerHTML = `
+                        <img src="${product.image}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                        <p>R$ ${product.price.toFixed(2)}</p>
+                        <button class="add-to-cart" data-name="${product.name}" data-price="${product.price}">Adicionar ao Carrinho</button>
+                    `;
+                    productGrid.appendChild(productElement);
+                });
+
+                // Adiciona evento aos botões de adicionar ao carrinho
+                const addToCartButtons = document.querySelectorAll('.add-to-cart');
+                addToCartButtons.forEach(button => {
+                    button.addEventListener('click', () => {
+                        const name = button.getAttribute('data-name');
+                        const price = parseFloat(button.getAttribute('data-price'));
+                        addToCart(name, price);
+                    });
+                });
+
+                pageInfo.textContent = `Página ${page} de ${Math.ceil(products.length / productsPerPage)}`;
+            }
+
+            // Eventos de paginação
+            prevPageButton.addEventListener('click', () => {
+                if (currentPage > 1) {
+                    currentPage--;
+                    displayProducts(currentPage);
+                }
+            });
+
+            nextPageButton.addEventListener('click', () => {
+                if (currentPage < Math.ceil(products.length / productsPerPage)) {
+                    currentPage++;
+                    displayProducts(currentPage);
+                }
+            });
+
+            // Inicializa a UI
+            displayProducts(currentPage);
+            updateCartUI();
+
+            // Envia o pedido pelo WhatsApp
+            checkoutForm.addEventListener('submit', checkout);
+        });
+    </script>
+</body>
+</html>
